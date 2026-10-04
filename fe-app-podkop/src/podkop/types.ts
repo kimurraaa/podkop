@@ -106,6 +106,13 @@ export namespace Podkop {
     proxy_config_type: 'url';
     proxy_string: string;
   }
+  export interface ConfigProxySubscriptionSection {
+    connection_type: 'proxy';
+    proxy_config_type: 'subscription';
+    subscription_url: string;
+    subscription_mode?: 'selector' | 'urltest';
+    subscription_update_interval?: '1h' | '3h' | '12h' | '1d' | '3d';
+  }
 
   export interface ConfigProxyOutboundSection {
     connection_type: 'proxy';
@@ -131,6 +138,7 @@ export namespace Podkop {
     | ConfigProxySelectorSection
     | ConfigProxyUrlSection
     | ConfigProxyOutboundSection
+    | ConfigProxySubscriptionSection
     | ConfigVpnSection
     | ConfigBlockSection
     | ConfigExclusionSection;
@@ -152,8 +160,7 @@ export namespace Podkop {
   }
 
   export type MethodResponse<T> =
-    | MethodSuccessResponse<T>
-    | MethodFailureResponse;
+    MethodSuccessResponse<T> | MethodFailureResponse;
 
   export interface DnsCheckResult {
     dns_type: 'udp' | 'doh' | 'dot';

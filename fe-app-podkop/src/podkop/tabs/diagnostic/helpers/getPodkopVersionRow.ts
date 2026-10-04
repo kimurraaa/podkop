@@ -22,7 +22,7 @@ export function getPodkopVersionRow(
 
   if (loading || unknown || !hasActualVersion || isDevVersion) {
     return {
-      key: 'Podkop',
+      key: 'Podkop Orbit',
       value: version,
     };
   }
@@ -32,7 +32,7 @@ export function getPodkopVersionRow(
     removeVersionPrefix(diagnosticsSystemInfo.podkop_latest_version)
   ) {
     return {
-      key: 'Podkop',
+      key: 'Podkop Orbit',
       value: version,
       tag: {
         label: _('Outdated'),
@@ -42,7 +42,7 @@ export function getPodkopVersionRow(
   }
 
   return {
-    key: 'Podkop',
+    key: 'Podkop Orbit',
     value: version,
     tag: {
       label: _('Latest'),

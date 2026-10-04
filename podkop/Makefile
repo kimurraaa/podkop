@@ -1,28 +1,27 @@
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=podkop
+PKG_NAME:=podkop-orbit
 
 PKG_VERSION := $(if $(PODKOP_VERSION),$(PODKOP_VERSION),0.$(shell date +%d%m%Y))
 
 PKG_RELEASE:=1
 
-PKG_MAINTAINER:=ITDog <podkop@itdog.info>
 PKG_LICENSE:=GPL-2.0-or-later
 
 include $(INCLUDE_DIR)/package.mk
 
-define Package/podkop
+define Package/podkop-orbit
 	SECTION:=net
 	CATEGORY:=Network
-	DEPENDS:=+sing-box +curl +jq +kmod-nft-tproxy +coreutils-base64 +bind-dig
+	DEPENDS:=+sing-box +curl +jq +ucode +ucode-mod-fs +kmod-nft-tproxy +coreutils-base64 +bind-dig
 	CONFLICTS:=https-dns-proxy nextdns luci-app-passwall luci-app-passwall2
-	TITLE:=Domain routing app
-	URL:=https://podkop.net
+	TITLE:=Podkop Orbit backend service
+	URL:=https://github.com/kimurraaa/podkop
 	PKGARCH:=all
 endef
 
-define Package/podkop/description
-	Domain routing. Use of VLESS, Shadowsocks technologies
+define Package/podkop-orbit/description
+	Podkop Orbit domain routing service. Uses sing-box for proxy routing.
 endef
 
 define Build/Configure
@@ -31,7 +30,7 @@ endef
 define Build/Compile
 endef
 
-define Package/podkop/prerm
+define Package/podkop-orbit/prerm
 #!/bin/sh
 
 grep -q "105 podkop" /etc/iproute2/rt_tables && sed -i "/105 podkop/d" /etc/iproute2/rt_tables
@@ -41,11 +40,11 @@ grep -q "105 podkop" /etc/iproute2/rt_tables && sed -i "/105 podkop/d" /etc/ipro
 exit 0
 endef
 
-define Package/podkop/conffiles
+define Package/podkop-orbit/conffiles
 /etc/config/podkop
 endef
 
-define Package/podkop/install
+define Package/podkop-orbit/install
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/etc/init.d/podkop $(1)/etc/init.d/podkop
 
@@ -61,4 +60,4 @@ define Package/podkop/install
 	sed -i -e 's/__COMPILED_VERSION_VARIABLE__/$(PKG_VERSION)/g' $(1)/usr/lib/podkop/constants.sh
 endef
 
-$(eval $(call BuildPackage,podkop))
+$(eval $(call BuildPackage,podkop-orbit))

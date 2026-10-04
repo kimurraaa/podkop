@@ -20,6 +20,8 @@ check_required_file "$PODKOP_LIB/sing_box_config_manager.sh"
 check_required_file "$PODKOP_LIB/sing_box_config_facade.sh"
 check_required_file "$PODKOP_LIB/logging.sh"
 check_required_file "$PODKOP_LIB/rulesets.sh"
+check_required_file "$PODKOP_LIB/subscriptions.sh"
+check_required_file "$PODKOP_LIB/subscription_parser.uc"
 . /lib/functions.sh
 . /lib/config/uci.sh
 . /lib/functions/network.sh
@@ -30,6 +32,7 @@ check_required_file "$PODKOP_LIB/rulesets.sh"
 . "$PODKOP_LIB/sing_box_config_facade.sh"
 . "$PODKOP_LIB/logging.sh"
 . "$PODKOP_LIB/rulesets.sh"
+. "$PODKOP_LIB/subscriptions.sh"
 
 config_load "$PODKOP_CONFIG"
 
@@ -78,23 +81,24 @@ check_requirements() {
     if has_outbound_section; then
         log "Outbound section found" "debug"
     else
-        log "Outbound section not found. Please check your configuration file (missing proxy_string, selector_proxy_links, urltest_proxy_links, outbound_json, or interface). Aborted." "error"
+        log "Outbound section not found. Please check your configuration file (missing proxy_string, subscription_url, selector_proxy_links, urltest_proxy_links, outbound_json, or interface). Aborted." "error"
         exit 1
     fi
 }
 
 _check_outbound_section() {
     local section="$1"
-    local proxy_string interface outbound_json urltest_proxy_links
+    local proxy_string interface outbound_json urltest_proxy_links subscription_url
 
     config_get proxy_string "$section" "proxy_string"
     config_get selector_proxy_links "$section" "selector_proxy_links"
     config_get urltest_proxy_links "$section" "urltest_proxy_links"
     config_get outbound_json "$section" "outbound_json"
     config_get interface "$section" "interface"
+    config_get subscription_url "$section" "subscription_url"
 
     if [ -n "$proxy_string" ] || [ -n "$selector_proxy_links" ] || [ -n "$urltest_proxy_links" ] ||
-        [ -n "$outbound_json" ] || [ -n "$interface" ]; then
+        [ -n "$outbound_json" ] || [ -n "$interface" ] || [ -n "$subscription_url" ]; then
         section_exists=0
     fi
 }
@@ -134,6 +138,7 @@ start_main() {
     # sing-box
     sing_box_init_config
     config_foreach add_cron_job "section"
+    refresh_subscription_cron_jobs
     /etc/init.d/sing-box start
 
     log "Nice"
@@ -154,6 +159,7 @@ stop_main() {
     fi
 
     remove_cron_job
+    (crontab -l 2>/dev/null | grep -v '# podkop-subscription-update') | crontab -
 
     rm -f "$TMP_RULESET_FOLDER"/*
 
@@ -642,6 +648,34 @@ configure_outbound_handler() {
                 exit 1
             fi
             config=$(sing_box_cf_add_proxy_outbound "$config" "$section" "$proxy_string" "$udp_over_tcp")
+            ;;
+        subscription)
+            log "Detected proxy configuration type: subscription" "debug"
+            local subscription_url subscription_outbounds subscription_mode udp_over_tcp
+            config_get subscription_url "$section" "subscription_url"
+            config_get subscription_mode "$section" "subscription_mode" "urltest"
+            config_get udp_over_tcp "$section" "enable_udp_over_tcp"
+
+            if [ -z "$subscription_url" ]; then
+                log "Subscription URL is not set. Aborted." "fatal"
+                exit 1
+            fi
+
+            subscription_outbounds=$(subscription_get_outbounds "$section" "$subscription_url") || {
+                log "Subscription '$section' has no usable proxy links. Aborted." "fatal"
+                exit 1
+            }
+
+            if [ -f "$TMP_SING_BOX_FOLDER/subscriptions/$section.changed" ]; then
+                subscription_mode="urltest"
+                rm -f "$TMP_SING_BOX_FOLDER/subscriptions/$section.changed"
+            fi
+
+            config=$(sing_box_cf_add_subscription_outbounds "$config" "$section" "$subscription_outbounds" \
+                "$subscription_mode" "$udp_over_tcp") || {
+                log "Failed to create sing-box outbounds for subscription '$section'. Aborted." "fatal"
+                exit 1
+            }
             ;;
         outbound)
             log "Detected proxy configuration type: outbound" "debug"
@@ -1839,6 +1873,7 @@ show_config() {
     tmp_config=$(mktemp)
 
     sed -e 's/\(option proxy_string\).*/\1 '\''MASKED'\''/g' \
+        -e 's/\(option subscription_url\).*/\1 '\''MASKED'\''/g' \
         -e '/option outbound_json/,/^}/c\	option outbound_json '\''MASKED'\''' \
         -e 's/\(list urltest_proxy_links\).*/\1 '\''MASKED'\''/g' \
         -e 's/\(list selector_proxy_links\).*/\1 '\''MASKED'\''/g' \

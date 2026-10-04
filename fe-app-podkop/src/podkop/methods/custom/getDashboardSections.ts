@@ -60,6 +60,46 @@ export async function getDashboardSections(): Promise<IGetDashboardSectionsRespo
             ],
           };
         }
+        if (section.proxy_config_type === 'subscription') {
+          const selector = proxies.find(
+            (proxy) => proxy.code === `${section['.name']}-out`,
+          );
+          const isManual = section.subscription_mode === 'selector';
+          const group = proxies.find(
+            (proxy) => proxy.code === `${section['.name']}-urltest-out`,
+          );
+          const nodePrefix = `${section['.name']}-`;
+          const nodes = isManual
+            ? proxies.filter(
+                (proxy) =>
+                  proxy.code.startsWith(nodePrefix) &&
+                  /^\d+-out$/.test(proxy.code.slice(nodePrefix.length)),
+              )
+            : (group?.value?.all ?? []).map((code) =>
+                proxies.find((proxy) => proxy.code === code),
+              );
+          const outbounds = nodes.map((proxy) => ({
+            code: proxy?.code || '',
+            displayName: proxy?.value?.name || '',
+            latency: proxy?.value?.history?.[0]?.delay || 0,
+            type: proxy?.value?.type || '',
+            selected: selector?.value?.now === proxy?.code,
+          }));
+          const fastestOutbound = {
+            code: group?.code || '',
+            displayName: _('Fastest'),
+            latency: group?.value?.history?.[0]?.delay || 0,
+            type: group?.value?.type || '',
+            selected: selector?.value?.now === group?.code,
+          };
+
+          return {
+            withTagSelect: true,
+            code: selector?.code || section['.name'],
+            displayName: section['.name'],
+            outbounds: [fastestOutbound, ...outbounds],
+          };
+        }
 
         if (section.proxy_config_type === 'outbound') {
           const outbound = proxies.find(

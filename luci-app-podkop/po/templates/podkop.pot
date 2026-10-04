@@ -135,6 +135,18 @@ msgstr ""
 msgid "Configuration Type"
 msgstr ""
 
+#: ../luci-app-podkop/htdocs/luci-static/resources/view/podkop/section.js:37
+msgid "A URL that returns proxy links, either as plain text or a Base64-encoded list."
+msgstr ""
+
+#: ../luci-app-podkop/htdocs/luci-static/resources/view/podkop/section.js:48
+msgid "Choose a server manually or let sing-box use the fastest server automatically."
+msgstr ""
+
+#: ../luci-app-podkop/htdocs/luci-static/resources/view/podkop/section.js:53
+msgid "Choose a server manually"
+msgstr ""
+
 #: ../luci-app-podkop/htdocs/luci-static/resources/view/podkop/section.js:12
 msgid "Connection Type"
 msgstr ""
@@ -351,6 +363,10 @@ msgstr ""
 #: src/podkop/methods/custom/getDashboardSections.ts:148
 #: src/podkop/tabs/diagnostic/checks/runSectionsCheck.ts:59
 msgid "Fastest"
+msgstr ""
+
+#: ../luci-app-podkop/htdocs/luci-static/resources/view/podkop/section.js:52
+msgid "Fastest server automatically"
 msgstr ""
 
 #: ../luci-app-podkop/htdocs/luci-static/resources/view/podkop/section.js:638
@@ -639,6 +655,46 @@ msgstr ""
 
 #: ../luci-app-podkop/htdocs/luci-static/resources/view/podkop/section.js:65
 msgid "Outbound Configuration"
+msgstr ""
+
+#: ../luci-app-podkop/htdocs/luci-static/resources/view/podkop/section.js:37
+msgid "Subscription"
+msgstr ""
+
+#: ../luci-app-podkop/htdocs/luci-static/resources/view/podkop/section.js:36
+msgid "Subscription URL"
+msgstr ""
+
+#: ../luci-app-podkop/htdocs/luci-static/resources/view/podkop/section.js:65
+msgid "Subscription update interval"
+msgstr ""
+
+#: ../luci-app-podkop/htdocs/luci-static/resources/view/podkop/section.js:66
+msgid "How often Podkop downloads this subscription."
+msgstr ""
+
+#: ../luci-app-podkop/htdocs/luci-static/resources/view/podkop/section.js:63
+msgid "Node selection"
+msgstr ""
+
+#: ../luci-app-podkop/htdocs/luci-static/resources/view/podkop/section.js:66
+msgid "Every hour"
+msgstr ""
+
+#: ../luci-app-podkop/htdocs/luci-static/resources/view/podkop/section.js:67
+msgid "Every 3 hours"
+msgstr ""
+
+#: ../luci-app-podkop/htdocs/luci-static/resources/view/podkop/section.js:68
+msgid "Every 12 hours"
+msgstr ""
+
+#: ../luci-app-podkop/htdocs/luci-static/resources/view/podkop/section.js:69
+msgid "Every day"
+msgstr ""
+
+#: ../luci-app-podkop/htdocs/luci-static/resources/view/podkop/section.js:70
+msgid "Every 3 days"
 msgstr ""
 
 #: src/podkop/tabs/diagnostic/helpers/getPodkopVersionRow.ts:38

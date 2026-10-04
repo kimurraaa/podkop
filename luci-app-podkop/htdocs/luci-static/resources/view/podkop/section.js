@@ -27,14 +27,51 @@ function createSectionContent(section) {
   o.value("selector", _("Selector"));
   o.value("urltest", _("URLTest"));
   o.value("outbound", _("Outbound Config"));
+  o.value("subscription", _("Subscription"));
   o.default = "url";
   o.depends("connection_type", "proxy");
+
+  o = section.option(
+    form.Value,
+    "subscription_url",
+    _("Subscription URL"),
+    _("A URL that returns proxy links, either as plain text or a Base64-encoded list."),
+  );
+  o.depends("proxy_config_type", "subscription");
+  o.rmempty = false;
+
+  o = section.option(
+    form.ListValue,
+    "subscription_mode",
+    _("Node selection"),
+    _("Choose a server manually or let sing-box use the fastest server automatically."),
+  );
+  o.value("urltest", _("Fastest server automatically"));
+  o.value("selector", _("Choose a server manually"));
+  o.default = "urltest";
+  o.rmempty = false;
+  o.depends("proxy_config_type", "subscription");
+
+  o = section.option(
+    form.ListValue,
+    "subscription_update_interval",
+    _("Subscription update interval"),
+    _("How often Podkop downloads this subscription."),
+  );
+  o.value("1h", _("Every hour"));
+  o.value("3h", _("Every 3 hours"));
+  o.value("12h", _("Every 12 hours"));
+  o.value("1d", _("Every day"));
+  o.value("3d", _("Every 3 days"));
+  o.default = "12h";
+  o.rmempty = false;
+  o.depends("proxy_config_type", "subscription");
 
   o = section.option(
     form.TextValue,
     "proxy_string",
     _("Proxy Configuration URL"),
-    _("vless://, ss://, trojan://, socks4/5://, hy2/hysteria2:// links")
+    _("vless://, ss://, trojan://, socks4/5://, hy2/hysteria2:// links"),
   );
   o.depends("proxy_config_type", "url");
   o.rows = 5;
@@ -86,7 +123,7 @@ function createSectionContent(section) {
     form.DynamicList,
     "selector_proxy_links",
     _("Selector Proxy Links"),
-    _("vless://, ss://, trojan://, socks4/5://, hy2/hysteria2:// links")
+    _("vless://, ss://, trojan://, socks4/5://, hy2/hysteria2:// links"),
   );
   o.depends("proxy_config_type", "selector");
   o.rmempty = false;
@@ -109,7 +146,7 @@ function createSectionContent(section) {
     form.DynamicList,
     "urltest_proxy_links",
     _("URLTest Proxy Links"),
-    _("vless://, ss://, trojan://, socks4/5://, hy2/hysteria2:// links")
+    _("vless://, ss://, trojan://, socks4/5://, hy2/hysteria2:// links"),
   );
   o.depends("proxy_config_type", "urltest");
   o.rmempty = false;
@@ -132,7 +169,7 @@ function createSectionContent(section) {
     form.ListValue,
     "urltest_check_interval",
     _("URLTest Check Interval"),
-    _("The interval between connectivity tests")
+    _("The interval between connectivity tests"),
   );
   o.value("30s", _("Every 30 seconds"));
   o.value("1m", _("Every 1 minute"));
@@ -145,7 +182,9 @@ function createSectionContent(section) {
     form.Value,
     "urltest_tolerance",
     _("URLTest Tolerance"),
-    _("The maximum difference in response times (ms) allowed when comparing servers")
+    _(
+      "The maximum difference in response times (ms) allowed when comparing servers",
+    ),
   );
   o.default = "50";
   o.rmempty = false;
@@ -157,23 +196,38 @@ function createSectionContent(section) {
 
     const parsed = parseFloat(value);
 
-    if (/^[0-9]+$/.test(value) && !isNaN(parsed) && isFinite(parsed) && parsed >= 50 && parsed <= 1000) {
+    if (
+      /^[0-9]+$/.test(value) &&
+      !isNaN(parsed) &&
+      isFinite(parsed) &&
+      parsed >= 50 &&
+      parsed <= 1000
+    ) {
       return true;
     }
 
-    return _('Must be a number in the range of 50 - 1000');
+    return _("Must be a number in the range of 50 - 1000");
   };
 
   o = section.option(
     form.Value,
     "urltest_testing_url",
     _("URLTest Testing URL"),
-    _("The URL used to test server connectivity")
+    _("The URL used to test server connectivity"),
   );
-  o.value("https://www.gstatic.com/generate_204", "https://www.gstatic.com/generate_204 (Google)");
-  o.value("https://cp.cloudflare.com/generate_204", "https://cp.cloudflare.com/generate_204 (Cloudflare)");
+  o.value(
+    "https://www.gstatic.com/generate_204",
+    "https://www.gstatic.com/generate_204 (Google)",
+  );
+  o.value(
+    "https://cp.cloudflare.com/generate_204",
+    "https://cp.cloudflare.com/generate_204 (Cloudflare)",
+  );
   o.value("https://captive.apple.com", "https://captive.apple.com (Apple)");
-  o.value("https://connectivity-check.ubuntu.com", "https://connectivity-check.ubuntu.com (Ubuntu)")
+  o.value(
+    "https://connectivity-check.ubuntu.com",
+    "https://connectivity-check.ubuntu.com (Ubuntu)",
+  );
   o.default = "https://www.gstatic.com/generate_204";
   o.rmempty = false;
   o.depends("proxy_config_type", "urltest");

@@ -1,54 +1,13 @@
-# Podkop
+# Podkop Orbit
 
-Маршрутизация трафика для OpenWrt.
+Podkop Orbit is an extension of Podkop that adds subscription management to proxy sections. It keeps Podkop's routing flow and adds automatic fastest-node or manual selection, with subscription refresh every 12 hours by default.
 
-Направляйте нужные ресурсы в туннель, а остальное — напрямую. Открытое программное обеспечение на базе [sing-box](https://github.com/SagerNet/sing-box).
+The repository is private. Installation requires a read-only GitHub token and a release created from a version tag. See the [short install guide](docs/install-podkop-orbit.md).
 
-> [!WARNING]
-> Проект находится в стадии бета-версии. Возможны ошибки, нестабильная работа и существенные изменения функциональности.
-
-# Вещи, которые необходимо знать перед установкой
-
-### Обновления и конфигурация
-- При обновлении **обязательно** [очищайте кэш LuCI](https://podkop.net/docs/clear-browser-cache/).
-- После обновления проверяйте конфигурацию — она может изменяться между версиями.
-- При старте Podkop модифицируется конфигурация Dnsmasq.
-- Podkop изменяет конфигурацию sing-box. Если вы используете собственную конфигурацию, заранее сохраните её.
-
-### Системные требования
-- Требуется OpenWrt 24.10 или выше.
-- Необходимо минимум 25 МБ свободного места на устройстве. Устройства с флеш-памятью 16 МБ не поддерживаются.
-
-### Важные ограничения и особенности
-- Если установлен Getdomains, его [необходимо удалить](https://github.com/itdoginfo/domain-routing-openwrt?tab=readme-ov-file#скрипт-для-удаления)
-- Dashboard доступен только при подключении по HTTP (из-за особенностей Clash API). При использовании HTTPS или домена работа может быть недоступна.
-
-### Поддержка и диагностика
-- [Руководство по диагностике](https://podkop.net/docs/diagnostics/)
-- Актуальные изменения публикуются в [Telegram-чате](https://t.me/itdogchat/81758/420321). Пожалуйста, ознакомьтесь с закрепленными сообщениями.
-- При возникновении проблем оставляйте технически грамотный фидбэк в GitHub Issues и Telegram-чате.
-
-
-# Документация
-https://podkop.net/
-
-# Установка Podkop
-Полное руководство доступно в [документации](https://podkop.net/docs/install/)
-
-Для установки и обновления достаточно выполнить один скрипт:
+```sh
+TOKEN="$(cat /root/.config/podkop-orbit/github-token)" && \
+wget --header="Accept: application/vnd.github.raw+json" \
+  --header="Authorization: Bearer $TOKEN" -qO /tmp/podkop-orbit-install.sh \
+  "https://api.github.com/repos/kimurraaa/podkop/contents/install.sh?ref=podkop-orbit" && \
+sh /tmp/podkop-orbit-install.sh
 ```
-sh <(wget -O - https://raw.githubusercontent.com/itdoginfo/podkop/refs/heads/main/install.sh)
-```
-
-## Будущее
-Планы развития проекта в настоящее время не публикуются в виде открытого roadmap. Обсуждение направлений и задач разработки ведётся авторами и контрибьюторами.
-
-> [!IMPORTANT]  
-> Pull Request принимаются только после согласования с авторами в Telegram-чате. На данный момент PR без предварительного обсуждения не рассматриваются.
-
-> [!WARNING]
-> Данное программное обеспечение предоставляется «как есть», без каких-либо явных или подразумеваемых гарантий, включая гарантии коммерческой пригодности и соответствия определённой цели. 
-> 
-> Правообладатели и участники проекта не несут ответственности за любые прямые, косвенные, случайные, специальные или иные убытки, возникшие в результате использования программного обеспечения, включая потерю данных, прибыли или прерывание деятельности, даже если они были предупреждены о возможности таких последствий.
-
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/itdoginfo/podkop)

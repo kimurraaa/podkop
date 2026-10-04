@@ -1,6 +1,6 @@
 {
-  "luci-app-podkop": {
-    "description": "Grant UCI and RPC access to LuCI app podkop",
+  "luci-app-podkop-orbit": {
+    "description": "Grant UCI and RPC access to LuCI app Podkop Orbit",
     "read": {
       "file": {
         "/etc/init.d/podkop": [

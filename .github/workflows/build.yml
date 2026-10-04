@@ -23,7 +23,7 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
   build:
-    name: Builder for ${{ matrix.package_type }} podkop and luci-app-podkop
+    name: Builder for ${{ matrix.package_type }} Podkop Orbit
     runs-on: ubuntu-latest
     needs: preparation
     strategy:
@@ -73,9 +73,9 @@ jobs:
           VERSION="${{ needs.preparation.outputs.version }}"
 
           mkdir -p ./filtered-bin/${{ matrix.package_type }}
-          cp ./bin/${{ matrix.package_type }}/luci-i18n-podkop-ru-*.${{ matrix.package_type }} "./filtered-bin/${{ matrix.package_type }}/luci-i18n-podkop-ru-${VERSION}.${{ matrix.package_type }}"
+          cp ./bin/${{ matrix.package_type }}/luci-i18n-podkop-orbit-ru-*.${{ matrix.package_type }} "./filtered-bin/${{ matrix.package_type }}/luci-i18n-podkop-orbit-ru-${VERSION}.${{ matrix.package_type }}"
           cp ./bin/${{ matrix.package_type }}/podkop-*.${{ matrix.package_type }} ./filtered-bin/${{ matrix.package_type }}/
-          cp ./bin/${{ matrix.package_type }}/luci-app-podkop-*.${{ matrix.package_type }} ./filtered-bin/${{ matrix.package_type }}/
+          cp ./bin/${{ matrix.package_type }}/luci-app-podkop-orbit-*.${{ matrix.package_type }} ./filtered-bin/${{ matrix.package_type }}/
 
       - name: Remove Docker container
         run: docker rm ${{ matrix.package_type }}

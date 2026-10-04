@@ -101,6 +101,15 @@ msgstr "Настройки сервиса Podkop"
 msgid "Configuration Type"
 msgstr "Тип конфигурации"
 
+msgid "A URL that returns proxy links, either as plain text or a Base64-encoded list."
+msgstr "Ссылка, возвращающая список прокси в обычном виде или в формате Base64."
+
+msgid "Choose a server manually or let sing-box use the fastest server automatically."
+msgstr "Выберите сервер вручную или поручите sing-box автоматически выбирать самый быстрый."
+
+msgid "Choose a server manually"
+msgstr "Выбирать сервер вручную"
+
 msgid "Connection Type"
 msgstr "Тип подключения"
 
@@ -253,6 +262,9 @@ msgstr "Не удалось выполнить!"
 
 msgid "Fastest"
 msgstr "Самый быстрый"
+
+msgid "Fastest server automatically"
+msgstr "Автоматически выбирать самый быстрый сервер"
 
 msgid "Fully Routed IPs"
 msgstr "Полностью маршрутизированные IP-адреса"
@@ -463,6 +475,36 @@ msgstr "Конфигурация Outbound"
 
 msgid "Outbound Configuration"
 msgstr "Конфигурация исходящего соединения"
+
+msgid "Subscription"
+msgstr "Подписка"
+
+msgid "Subscription URL"
+msgstr "Ссылка на подписку"
+
+msgid "Subscription update interval"
+msgstr "Интервал обновления подписки"
+
+msgid "How often Podkop downloads this subscription."
+msgstr "Как часто Podkop загружает эту подписку."
+
+msgid "Node selection"
+msgstr "Выбор узла"
+
+msgid "Every hour"
+msgstr "Каждый час"
+
+msgid "Every 3 hours"
+msgstr "Каждые 3 часа"
+
+msgid "Every 12 hours"
+msgstr "Каждые 12 часов"
+
+msgid "Every day"
+msgstr "Каждый день"
+
+msgid "Every 3 days"
+msgstr "Каждые 3 дня"
 
 msgid "Outdated"
 msgstr "Устаревшая"

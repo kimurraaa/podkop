@@ -27,7 +27,7 @@ describe('getPodkopVersionRow', () => {
     );
 
     expect(row).toEqual({
-      key: 'Podkop',
+      key: 'Podkop Orbit',
       value: 'v1.2.3',
       tag: {
         label: 'Latest',
@@ -45,7 +45,7 @@ describe('getPodkopVersionRow', () => {
     );
 
     expect(row).toEqual({
-      key: 'Podkop',
+      key: 'Podkop Orbit',
       value: '1.2.2',
       tag: {
         label: 'Outdated',
@@ -62,7 +62,7 @@ describe('getPodkopVersionRow', () => {
     );
 
     expect(row).toEqual({
-      key: 'Podkop',
+      key: 'Podkop Orbit',
       value: 'dev',
     });
   });

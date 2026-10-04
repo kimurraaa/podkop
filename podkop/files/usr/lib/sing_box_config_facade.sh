@@ -221,6 +221,71 @@ _add_outbound_security() {
     echo "$config"
 }
 
+# Add normalized subscription outbounds, then expose a selectable group or the
+# fastest URLTest group. Outbound normalization is shared with Forkop's parser.
+sing_box_cf_add_subscription_outbounds() {
+    local config="$1" section="$2" outbounds_file="$3" mode="$4" udp_over_tcp="$5"
+    local outbounds_json tag_map encoded_file encoded outbound_tags urltest_tag selector_tag
+    local urltest_outbounds selector_outbounds default_outbound outbound tag i
+
+    outbound_tags=""
+    default_outbound=""
+    i=1
+
+    outbounds_json=$(jq -c '[.outbounds[] | select(.type != "selector" and .type != "urltest" and .type != "direct" and .type != "block" and .type != "dns")]' "$outbounds_file") || return 1
+    [ "$(printf '%s' "$outbounds_json" | jq 'length')" -gt 0 ] || return 1
+    tag_map=$(printf '%s' "$outbounds_json" | jq -c --arg prefix "$section" '
+        to_entries
+        | map({ key: (if (.value.tag // "") == "" then "__podkop_missing_tag_" + ((.key + 1) | tostring) else .value.tag end), value: ($prefix + "-" + ((.key + 1) | tostring)) })
+        | from_entries
+    ') || return 1
+
+    # Base64 keeps compact JSON objects with spaces safe in a POSIX shell loop.
+    encoded_file="$TMP_SING_BOX_FOLDER/subscriptions/$section.outbounds.b64"
+    printf '%s' "$outbounds_json" | jq -cr --arg prefix "$section" --arg udp_over_tcp "$udp_over_tcp" --argjson tag_map "$tag_map" '
+        to_entries[] as $entry
+        | $entry.value as $outbound
+        | (if ($outbound.tag // "") == "" then "__podkop_missing_tag_" + (($entry.key + 1) | tostring) else $outbound.tag end) as $old_tag
+        | $outbound
+        | .tag = ($tag_map[$old_tag] // ($prefix + "-" + (($entry.key + 1) | tostring)))
+        | if .detour then .detour = ($tag_map[.detour] // .detour) else . end
+        | if (.outbounds | type) == "array" then .outbounds |= map($tag_map[.] // .) else . end
+        | if $udp_over_tcp == "1" and (.type == "socks" or .type == "shadowsocks")
+            then .udp_over_tcp = { enabled: true, version: 2 } else . end
+        | walk(if type == "object" then with_entries(select((.key | startswith("__")) == false and .key != "share_link" and .key != "remark")) else . end)
+        | @base64
+    ' > "$encoded_file" || return 1
+
+    while IFS= read -r encoded; do
+        [ -n "$encoded" ] || continue
+        outbound=$(printf '%s' "$encoded" | base64 -d) || return 1
+        tag=$(get_outbound_tag_by_section "$section-$i")
+        config=$(sing_box_cm_add_raw_outbound "$config" "$tag" "$outbound") || return 1
+        if [ -z "$outbound_tags" ]; then
+            outbound_tags="$tag"
+            default_outbound="$tag"
+        else
+            outbound_tags="$outbound_tags,$tag"
+        fi
+        i=$((i + 1))
+    done < "$encoded_file"
+
+    [ -n "$outbound_tags" ] || return 1
+    selector_tag=$(get_outbound_tag_by_section "$section")
+    selector_outbounds=$(comma_string_to_json_array "$outbound_tags")
+    urltest_tag=$(get_outbound_tag_by_section "$section-urltest")
+    urltest_outbounds="$selector_outbounds"
+    config=$(sing_box_cm_add_urltest_outbound "$config" "$urltest_tag" "$urltest_outbounds" \
+        "https://www.gstatic.com/generate_204" "3m" "50")
+    selector_outbounds=$(comma_string_to_json_array "$outbound_tags,$urltest_tag")
+    if [ "$mode" != "selector" ]; then
+        default_outbound="$urltest_tag"
+    fi
+    config=$(sing_box_cm_add_selector_outbound "$config" "$selector_tag" "$selector_outbounds" "$default_outbound")
+
+    echo "$config"
+}
+
 _get_insecure_query_param_from_url() {
     local url="$1"
 
